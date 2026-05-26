@@ -52,7 +52,7 @@
     const ws = new WebSocket("ws://localhost:8080");
 
     const appendLog = (label, message) => {
-      const entry = `${new Date().toLocaleTimeString()} [${label}] \n`;
+      const entry = `${new Date().toLocaleTimeString()} ${label}: ${message} \n`;
       logEl.textContent = entry + logEl.textContent;
     };
 
@@ -70,6 +70,19 @@
 
     ws.addEventListener("message", (e) => {
       appendLog("[RECEIVED]", e.data);
+    });
+
+    formEl.addEventListener("submit", (e) => {
+      e.preventDefault();
+
+      if (ws.readyState !== WebSocket.OPEN) {
+        appendLog("[ERROR]", "No active tunnel found");
+        return;
+      }
+      const msg = inputEl.value.trim();
+      ws.send(msg);
+      appendLog("[SENT]", msg);
+      inputEl.value = "";
     });
   </script>
 </html>
